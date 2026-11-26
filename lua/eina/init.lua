@@ -1,3 +1,4 @@
+local habitat = require("eina.habitat")
 local highlight = require("eina.highlight")
 local render = require("eina.render")
 local sprite = require("eina.sprite")
@@ -6,13 +7,15 @@ local M = {}
 
 local state = { buf = nil, win = nil, width = 0, height = 0 }
 
--- Bottom-right corner, just above the statusline and command line.
+local BORDER = 2 -- the border adds one cell on each side
+
+-- Center of the screen. `width` and `height` are the inside of the box;
+-- the border comes on top.
 local function position(width, height)
-  local statusline = vim.o.laststatus > 0 and 1 or 0
   return {
     relative = "editor",
-    row = math.max(0, vim.o.lines - vim.o.cmdheight - statusline - height),
-    col = math.max(0, vim.o.columns - width - 1),
+    row = math.max(0, math.floor((vim.o.lines - (height + BORDER)) / 2)),
+    col = math.max(0, math.floor((vim.o.columns - (width + BORDER)) / 2)),
   }
 end
 
@@ -20,6 +23,9 @@ local function window_config(width, height)
   return vim.tbl_extend("force", position(width, height), {
     width = width,
     height = height,
+    border = "rounded",
+    title = " eina ",
+    title_pos = "left",
     style = "minimal",
     focusable = false,
     noautocmd = true,
@@ -36,8 +42,11 @@ function M.open()
     return
   end
 
-  local lines, marks = render.to_lines(sprite.base)
-  state.width = vim.fn.strdisplaywidth(lines[1])
+  local sprite_lines, sprite_marks = render.to_lines(sprite.base)
+  local sprite_width = vim.fn.strdisplaywidth(sprite_lines[1])
+  local x = math.floor((habitat.width - sprite_width) / 2) -- start in the middle
+  local lines, marks = habitat.build(sprite_lines, sprite_marks, x)
+  state.width = habitat.width
   state.height = #lines
 
   state.buf = vim.api.nvim_create_buf(false, true) -- unlisted scratch buffer
@@ -66,7 +75,7 @@ function M.toggle()
   end
 end
 
--- Stay in the corner when the terminal is resized. Registered once, when the
+-- Stay centered when the terminal is resized. Registered once, when the
 -- module loads, so it can't pile up; it does nothing while the pet is closed.
 vim.api.nvim_create_autocmd("VimResized", {
   group = vim.api.nvim_create_augroup("eina_window", { clear = true }),

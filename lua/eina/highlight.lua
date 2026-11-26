@@ -8,6 +8,11 @@ M.ns = vim.api.nvim_create_namespace("eina")
 -- (switching colorschemes clears highlight groups it doesn't know about).
 local defined = {}
 
+-- The habitat's floor matches the border color. `default = true` lets users
+-- override it with their own EinaFloor highlight.
+defined.EinaFloor = { link = "FloatBorder", default = true }
+vim.api.nvim_set_hl(0, "EinaFloor", defined.EinaFloor)
+
 vim.api.nvim_create_autocmd("ColorScheme", {
   group = vim.api.nvim_create_augroup("eina_highlight", { clear = true }),
   callback = function()
@@ -32,7 +37,8 @@ function M.apply(buf, marks, palette)
   for _, mark in ipairs(marks) do
     vim.api.nvim_buf_set_extmark(buf, M.ns, mark.row, mark.col, {
       end_col = mark.end_col,
-      hl_group = group_for(palette, mark.fg, mark.bg),
+      -- A mark either names its group directly, or gets one from its colors.
+      hl_group = mark.group or group_for(palette, mark.fg, mark.bg),
     })
   end
 end
