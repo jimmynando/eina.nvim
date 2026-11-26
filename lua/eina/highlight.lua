@@ -8,10 +8,21 @@ M.ns = vim.api.nvim_create_namespace("eina")
 -- (switching colorschemes clears highlight groups it doesn't know about).
 local defined = {}
 
--- The habitat's floor matches the border color. `default = true` lets users
--- override it with their own EinaFloor highlight.
-defined.EinaFloor = { link = "FloatBorder", default = true }
-vim.api.nvim_set_hl(0, "EinaFloor", defined.EinaFloor)
+-- Colors for the rest of the habitat, borrowed from the colorscheme so they
+-- fit any theme. `default = true` lets users override them with their own
+-- highlight of the same name.
+local habitat_colors = {
+  EinaFloor = "FloatBorder", -- floor matches the border
+  EinaKey = "Special", -- the [f] in "[f] Feed"
+  EinaMood = "DiagnosticOk", -- green
+  EinaSatiety = "DiagnosticInfo", -- blue
+  EinaLow = "DiagnosticError", -- red, for bars below 30%
+  EinaBarEmpty = "NonText", -- dim, for the empty part of a bar
+}
+for name, target in pairs(habitat_colors) do
+  defined[name] = { link = target, default = true }
+  vim.api.nvim_set_hl(0, name, defined[name])
+end
 
 vim.api.nvim_create_autocmd("ColorScheme", {
   group = vim.api.nvim_create_augroup("eina_highlight", { clear = true }),

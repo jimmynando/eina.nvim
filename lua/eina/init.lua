@@ -5,7 +5,14 @@ local sprite = require("eina.sprite")
 
 local M = {}
 
-local state = { buf = nil, win = nil, width = 0, height = 0 }
+local state = {
+  buf = nil,
+  win = nil,
+  width = 0,
+  height = 0,
+  -- Bar values from 0 to 100. Fixed for now: nothing changes them yet.
+  status = { mood = 100, satiety = 100 },
+}
 
 local BORDER = 2 -- the border adds one cell on each side
 
@@ -45,9 +52,9 @@ function M.open()
   local sprite_lines, sprite_marks = render.to_lines(sprite.base)
   local sprite_width = vim.fn.strdisplaywidth(sprite_lines[1])
   local x = math.floor((habitat.width - sprite_width) / 2) -- start in the middle
-  local lines, marks = habitat.build(sprite_lines, sprite_marks, x)
+  local lines, marks = habitat.build(sprite_lines, sprite_marks, x, state.status)
   state.width = habitat.width
-  state.height = #lines
+  state.height = habitat.height
 
   state.buf = vim.api.nvim_create_buf(false, true) -- unlisted scratch buffer
   vim.api.nvim_buf_set_lines(state.buf, 0, -1, false, lines)
