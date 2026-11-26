@@ -1,3 +1,4 @@
+local highlight = require("eina.highlight")
 local render = require("eina.render")
 local sprite = require("eina.sprite")
 
@@ -26,11 +27,12 @@ function M.open()
     return
   end
 
-  local lines = render.to_lines(sprite.base)
+  local lines, marks = render.to_lines(sprite.base)
   local width = vim.fn.strdisplaywidth(lines[1])
 
   state.buf = vim.api.nvim_create_buf(false, true) -- unlisted scratch buffer
   vim.api.nvim_buf_set_lines(state.buf, 0, -1, false, lines)
+  highlight.apply(state.buf, marks, sprite.palette)
   vim.bo[state.buf].modifiable = false
   vim.bo[state.buf].bufhidden = "wipe"
 
