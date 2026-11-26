@@ -18,6 +18,7 @@ M.base = {
   "...#######...",
 }
 
-M.palette = { ["#"] = "black" }
+-- Colors are hex codes or color names (see :help gui-colors).
+M.palette = { ["#"] = "#ebdbb2" } -- light cream, readable on dark themes
 
 return M
