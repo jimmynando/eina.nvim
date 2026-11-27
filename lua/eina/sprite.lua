@@ -4,7 +4,7 @@
 local M = {}
 
 M.frames = {
-  -- assets/eina.png, without the mouth
+  -- looking straight ahead
   idle = {
     "..##.....##..",
     ".####...####.",
