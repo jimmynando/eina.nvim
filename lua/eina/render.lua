@@ -4,6 +4,10 @@
 local M = {}
 
 local EMPTY = "."
+-- Not a pixel: a line drawn across the middle of its cell ("━"), thinner
+-- than a pixel can be. It takes the whole cell, so the other pixel sharing
+-- the cell is ignored. Its color comes from the palette like any pixel.
+local LINE = "_"
 
 local function is_filled(pixel)
   return pixel ~= "" and pixel ~= EMPTY
@@ -13,6 +17,9 @@ end
 -- foreground (fg) and background (bg). Empty halves get no bg, so the
 -- window background shows through.
 local function cell(top, bottom)
+  if top == LINE or bottom == LINE then
+    return "━", LINE
+  end
   local t, b = is_filled(top), is_filled(bottom)
   if t and b then
     if top == bottom then
