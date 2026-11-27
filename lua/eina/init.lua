@@ -46,11 +46,13 @@ function M.is_open()
   return state.win ~= nil and vim.api.nvim_win_is_valid(state.win)
 end
 
--- Fills the buffer with the whole habitat, showing eina with one frame.
-local function draw(frame)
+-- Fills the buffer with the whole habitat, showing eina with one frame,
+-- `shift` columns away from the middle (negative = left).
+local function draw(frame, shift)
   local sprite_lines, sprite_marks = render.to_lines(sprite.frames[frame])
   local sprite_width = vim.fn.strdisplaywidth(sprite_lines[1])
-  local x = math.floor((habitat.width - sprite_width) / 2) -- in the middle
+  local x = math.floor((habitat.width - sprite_width) / 2) + (shift or 0)
+  x = math.max(0, math.min(x, habitat.width - sprite_width)) -- stay inside the box
   local lines, marks = habitat.build(sprite_lines, sprite_marks, x, state.status)
 
   vim.bo[state.buf].modifiable = true
@@ -76,7 +78,7 @@ local function play()
     return
   end
   local step = sprite.animation[state.step]
-  draw(step.frame)
+  draw(step.frame, step.shift)
   state.step = state.step % #sprite.animation + 1 -- after the last, back to 1
   -- The timer calls back from outside Neovim's main loop, where most of
   -- Neovim's functions can't be used; schedule_wrap moves the call back in.

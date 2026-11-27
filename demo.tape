@@ -25,5 +25,5 @@ Type ":Eina"
 Sleep 300ms
 Enter
 
-# One full animation loop: blink, look left, blink, look right.
-Sleep 8.5s
+# One full animation loop: blink, look left, shiver, blink, look right.
+Sleep 10.5s

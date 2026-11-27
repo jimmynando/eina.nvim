@@ -20,7 +20,7 @@ center. Every direction is equally silly, so anyone can laugh at their own pet.
 Early days. What works today:
 
 - eina in a habitat window in the center of the screen
-- an idle animation: it blinks, and glances left and right
+- an idle animation: it blinks, glances left and right, and shivers
 - mood and satiety bars
 
 Not yet: the actions (`[f]`, `[b]`, `[s]`, `[q]`) are shown but don't do
