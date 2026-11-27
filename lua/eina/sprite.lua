@@ -71,12 +71,23 @@ M.frames = {
 }
 
 -- Played in a loop while eina is open: show each frame for `ms`
--- milliseconds, then move on to the next.
+-- milliseconds, then move on to the next. `shift` (optional) moves eina that
+-- many columns from the middle: -1 is one column left, 1 one column right.
 M.animation = {
   { frame = "idle", ms = 1500 },
   { frame = "blink", ms = 150 },
   { frame = "idle", ms = 1500 },
   { frame = "left", ms = 1000 },
+  { frame = "idle", ms = 1500 },
+  -- shiver: eyes shut, shaking left and right
+  { frame = "blink", ms = 30, shift = -1 },
+  { frame = "blink", ms = 30, shift = 0 },
+  { frame = "blink", ms = 30, shift = 1 },
+  { frame = "blink", ms = 30, shift = 0 },
+  { frame = "blink", ms = 30, shift = -1 },
+  { frame = "blink", ms = 30, shift = 0 },
+  { frame = "blink", ms = 30, shift = 1 },
+  { frame = "blink", ms = 30, shift = 0 },
   { frame = "idle", ms = 1500 },
   { frame = "blink", ms = 150 },
   { frame = "idle", ms = 1500 },
