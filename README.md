@@ -2,24 +2,7 @@
 
 A pixel-art pet that lives in Neovim.
 
-```
-╭ eina ──────────────────────────────────────╮
-│ [f] Feed  [b] Books  [s] Stats  [q] Close  │
-│                                            │
-│                                            │
-│                ▄██▄   ▄██▄                 │
-│                ▀███▄ ▄███▀                 │
-│                 █▀▀▀▀▀▀▀█                  │
-│                █  ▀   ▀  █                 │
-│               ██         ██                │
-│                ▀▄▄     ▄▄▀                 │
-│                  ▀▀▀▀▀▀▀                   │
-│▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔│
-│ Mood    ██████████████████████████████████ │
-│                                            │
-│ Satiety ██████████████████████████████████ │
-╰────────────────────────────────────────────╯
-```
+![eina blinking and looking around in its habitat](demo.gif)
 
 ## The idea
 
@@ -37,7 +20,7 @@ center. Every direction is equally silly, so anyone can laugh at their own pet.
 Early days. What works today:
 
 - eina in a habitat window in the center of the screen
-- an idle animation: it looks at you, then glances left and right
+- an idle animation: it blinks, and glances left and right
 - mood and satiety bars
 
 Not yet: the actions (`[f]`, `[b]`, `[s]`, `[q]`) are shown but don't do
@@ -91,5 +74,14 @@ vim.api.nvim_set_hl(0, "EinaMood", { fg = "#00ff00" })
 Sprites are plain text in `lua/eina/sprite.lua`, one character per pixel:
 `.` is empty, and any other character is a color from the palette. Two pixels
 share one terminal cell using half-blocks (`▀` `▄`), which keeps them square.
-The animation is a list of frames and how long each one shows, in the same
-file.
+A `_` draws a line thinner than a pixel, used for the closed eyes. The
+animation is a list of frames and how long each one shows, in the same file.
+
+## Updating the demo GIF
+
+`demo.gif` is recorded with [VHS](https://github.com/charmbracelet/vhs) from
+`demo.tape`. After changing how eina looks, run this from the repo root:
+
+```sh
+vhs demo.tape
+```
