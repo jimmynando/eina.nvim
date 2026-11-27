@@ -52,18 +52,41 @@ M.frames = {
     "..##.....##..",
     "...#######...",
   },
+  -- idle with the eyes closed: "_" draws a thin line instead of a pixel
+  blink = {
+    "..##.....##..",
+    ".####...####.",
+    ".####...####.",
+    "..####.####..",
+    "..#########..",
+    "..#.......#..",
+    ".#.._..._..#.",
+    ".#.........#.",
+    "##.........##",
+    "##.........##",
+    ".#.........#.",
+    "..##.....##..",
+    "...#######...",
+  },
 }
 
 -- Played in a loop while eina is open: show each frame for `ms`
 -- milliseconds, then move on to the next.
 M.animation = {
-  { frame = "idle", ms = 3000 },
+  { frame = "idle", ms = 1500 },
+  { frame = "blink", ms = 150 },
+  { frame = "idle", ms = 1500 },
   { frame = "left", ms = 1000 },
-  { frame = "idle", ms = 3000 },
+  { frame = "idle", ms = 1500 },
+  { frame = "blink", ms = 150 },
+  { frame = "idle", ms = 1500 },
   { frame = "right", ms = 1000 },
 }
 
 -- Colors are hex codes or color names (see :help gui-colors).
-M.palette = { ["#"] = "#ebdbb2" } -- light cream, readable on dark themes
+M.palette = {
+  ["#"] = "#ebdbb2", -- light cream, readable on dark themes
+  ["_"] = "#ebdbb2", -- the closed eyes, same cream
+}
 
 return M
