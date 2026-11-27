@@ -12,6 +12,8 @@ local state = {
   height = 0,
   -- Bar values from 0 to 100. Fixed for now: nothing changes them yet.
   status = { mood = 100, satiety = 100 },
+  timer = nil, -- plays the animation while the window is open
+  step = 1, -- which step of sprite.animation is showing
 }
 
 local BORDER = 2 -- the border adds one cell on each side
@@ -44,30 +46,65 @@ function M.is_open()
   return state.win ~= nil and vim.api.nvim_win_is_valid(state.win)
 end
 
+-- Fills the buffer with the whole habitat, showing eina with one frame.
+local function draw(frame)
+  local sprite_lines, sprite_marks = render.to_lines(sprite.frames[frame])
+  local sprite_width = vim.fn.strdisplaywidth(sprite_lines[1])
+  local x = math.floor((habitat.width - sprite_width) / 2) -- in the middle
+  local lines, marks = habitat.build(sprite_lines, sprite_marks, x, state.status)
+
+  vim.bo[state.buf].modifiable = true
+  vim.api.nvim_buf_set_lines(state.buf, 0, -1, false, lines)
+  vim.bo[state.buf].modifiable = false
+  highlight.apply(state.buf, marks, sprite.palette)
+end
+
+local function stop_animation()
+  if state.timer then
+    state.timer:stop()
+    state.timer:close()
+    state.timer = nil
+  end
+end
+
+-- Shows the current step of the animation, then sets the timer to show the
+-- next one after this step's `ms`. The timer fires once per step, because
+-- each step can last a different time.
+local function play()
+  if not M.is_open() then
+    stop_animation() -- the window was closed some other way (e.g. :only)
+    return
+  end
+  local step = sprite.animation[state.step]
+  draw(step.frame)
+  state.step = state.step % #sprite.animation + 1 -- after the last, back to 1
+  -- The timer calls back from outside Neovim's main loop, where most of
+  -- Neovim's functions can't be used; schedule_wrap moves the call back in.
+  state.timer:start(step.ms, 0, vim.schedule_wrap(play))
+end
+
 function M.open()
   if M.is_open() then
     return
   end
 
-  local sprite_lines, sprite_marks = render.to_lines(sprite.base)
-  local sprite_width = vim.fn.strdisplaywidth(sprite_lines[1])
-  local x = math.floor((habitat.width - sprite_width) / 2) -- start in the middle
-  local lines, marks = habitat.build(sprite_lines, sprite_marks, x, state.status)
   state.width = habitat.width
   state.height = habitat.height
-
   state.buf = vim.api.nvim_create_buf(false, true) -- unlisted scratch buffer
-  vim.api.nvim_buf_set_lines(state.buf, 0, -1, false, lines)
-  highlight.apply(state.buf, marks, sprite.palette)
-  vim.bo[state.buf].modifiable = false
   vim.bo[state.buf].bufhidden = "wipe"
 
   state.win = vim.api.nvim_open_win(state.buf, false, window_config(state.width, state.height))
   -- Use the editor background instead of the float's, so the pet blends in.
   vim.wo[state.win].winhighlight = "NormalFloat:Normal"
+
+  stop_animation() -- in case a timer from a window closed with :only is left
+  state.timer = vim.uv.new_timer()
+  state.step = 1
+  play()
 end
 
 function M.close()
+  stop_animation()
   if M.is_open() then
     vim.api.nvim_win_close(state.win, true)
   end
